@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import connectMongoDB from './db.js';
 import authRoutes from './Routes/Auth.js';
 
@@ -15,6 +16,7 @@ connectMongoDB();
 
 app.use(bodyParser.json());
 app.use(cors());
+app.use(cookieParser());
 
 app.use('/auth', authRoutes);
 
