@@ -1,5 +1,4 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
 import authTokenHandler from '../Middlewares/checkAuthTokenMiddleware.js';
 import Product from '../Models/ProductSchema.js';
 import User from '../Models/UserSchema.js';
@@ -9,6 +8,27 @@ const router = express.Router();
 router.get('/test', authTokenHandler, async (req, res) => {
   res.json({ message: 'Test api work for Products', userId: req.userId });
 });
+
+// check product ownership
+const checkProductOwnership = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product post not found' });
+    }
+
+    if (product.owner.toString() !== req.userId) {
+      return res
+        .status(403)
+        .json({ message: 'Permission denied: You do not own this Product' });
+    }
+
+    req.product = product;
+    next();
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // If user is authenticated he or she can Create a Product
 router.post('/', authTokenHandler, async (req, res) => {
@@ -35,9 +55,50 @@ router.post('/', authTokenHandler, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 // If user is authenticated he or she can Create a Product
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update a specific product by ID
+router.put(
+  '/:id',
+  authTokenHandler,
+  checkProductOwnership,
+  async (req, res) => {
+    try {
+      const { title, description, image } = req.body;
+      const updatedProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        { title, description, image },
+        { new: true }
+      );
+
+      if (!updatedProduct) {
+        return res.status(404).json({ message: 'Product post not found' });
+      }
+
+      res
+        .status(200)
+        .json({ message: 'Product updated successfully', updatedProduct });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
+
 // If user is authenticated he or she can Create a Product
-// If user is authenticated he or she can Create a Product
+
 // If user is authenticated he or she can Create a Product
 
 export default router;
