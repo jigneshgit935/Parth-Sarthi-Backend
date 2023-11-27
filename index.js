@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import connectMongoDB from './db.js';
 import authRoutes from './Routes/Auth.js';
+import productRoutes from './Routes/Product.js';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(cookieParser());
 
 app.use('/auth', authRoutes);
+app.use('/product', productRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'This Api is working' });
