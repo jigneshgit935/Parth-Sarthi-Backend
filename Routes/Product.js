@@ -5,10 +5,6 @@ import User from '../Models/UserSchema.js';
 
 const router = express.Router();
 
-router.get('/test', authTokenHandler, async (req, res) => {
-  res.json({ message: 'Test api work for Products', userId: req.userId });
-});
-
 // check product ownership
 const checkProductOwnership = async (req, res, next) => {
   try {
@@ -103,14 +99,14 @@ router.delete(
   checkProductOwnership,
   async (req, res) => {
     try {
-      // Find the blog post by ID and delete it
+      // Find the product post by ID and delete it
       const deletedProduct = await Product.findByIdAndDelete(req.params.id);
 
       if (!deletedProduct) {
         return res.status(404).json({ message: 'Product not found' });
       }
 
-      // Remove the deleted blog ID from the user's blogs array
+      // Remove the deleted product ID from the user's products array
       const user = await User.findById(req.userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
