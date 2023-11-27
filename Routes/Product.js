@@ -85,7 +85,7 @@ router.put(
       );
 
       if (!updatedProduct) {
-        return res.status(404).json({ message: 'Product post not found' });
+        return res.status(404).json({ message: 'Product not found' });
       }
 
       res
@@ -97,8 +97,36 @@ router.put(
   }
 );
 
-// If user is authenticated he or she can Create a Product
+router.delete(
+  '/:id',
+  authTokenHandler,
+  checkProductOwnership,
+  async (req, res) => {
+    try {
+      // Find the blog post by ID and delete it
+      const deletedProduct = await Product.findByIdAndDelete(req.params.id);
 
-// If user is authenticated he or she can Create a Product
+      if (!deletedProduct) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+
+      // Remove the deleted blog ID from the user's blogs array
+      const user = await User.findById(req.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const productIndex = user.products.indexOf(req.params.id);
+      if (productIndex !== -1) {
+        user.products.splice(productIndex, 1);
+        await user.save();
+      }
+
+      res.status(200).json({ message: 'Product deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
 
 export default router;
