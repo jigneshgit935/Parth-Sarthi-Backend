@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 const router = express.Router();
 import User from '../Models/UserSchema.js';
 import errorHandler from '../Middlewares/errorMiddleware.js';
+import authTokenHandler from '../Middlewares/checkAuthTokenMiddleware.js';
 
 function createResponse(ok, message, data) {
   return {
@@ -77,5 +78,12 @@ router.post('/login', async (req, res, next) => {
 });
 
 router.use(errorHandler);
+
+router.get('/checklogin', authTokenHandler, async (req, res) => {
+  res.json({
+    ok: true,
+    message: 'User authenticated successfully',
+  });
+});
 
 export default router;
