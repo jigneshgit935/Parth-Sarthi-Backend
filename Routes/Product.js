@@ -44,11 +44,11 @@ const checkProductOwnership = async (req, res, next) => {
 // If user is authenticated he or she can Create a Product
 router.post('/', authTokenHandler, async (req, res) => {
   try {
-    const { title, description, image } = req.body;
+    const { title, description, imageUrl } = req.body;
     const product = new Product({
       title,
       description,
-      image,
+      imageUrl,
       owner: req.userId,
     });
     await product.save();
@@ -65,7 +65,7 @@ router.post('/', authTokenHandler, async (req, res) => {
       .status(201)
       .json(createResponse(true, 'Product created successfully', { product }));
   } catch (error) {
-    res.status(500).json(createResponse(false, err.message));
+    res.status(500).json(createResponse(false, error.message));
   }
 });
 
@@ -102,10 +102,10 @@ router.put(
   checkProductOwnership,
   async (req, res) => {
     try {
-      const { title, description, image } = req.body;
+      const { title, description, imageUrl } = req.body;
       const updatedProduct = await Product.findByIdAndUpdate(
         req.params.id,
-        { title, description, image },
+        { title, description, imageUrl },
         { new: true }
       );
 

@@ -58,14 +58,14 @@ router.post('/login', async (req, res, next) => {
     const authToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: '10m' }
+      { expiresIn: '1d' }
     );
 
     //generate refresh token
     const refreshToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_REFRESH_SECRET_KEY,
-      { expiresIn: '40m' }
+      { expiresIn: '2d' }
     );
 
     res.cookie('authToken', authToken, { httpOnly: true });
